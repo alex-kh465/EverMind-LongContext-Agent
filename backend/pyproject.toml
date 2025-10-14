@@ -1,0 +1,102 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+
+[project]
+name = "longcontext-agent-backend"
+version = "1.0.0"
+description = "LongContext Agent - Production-grade AI agent with resilient multi-turn memory management"
+authors = [
+    {name = "LongContext Agent Team"}
+]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.11"
+keywords = ["ai", "agent", "memory", "fastapi", "openai"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Framework :: FastAPI",
+]
+
+dependencies = [
+    "fastapi>=0.104.1",
+    "uvicorn[standard]>=0.24.0",
+    "sqlalchemy>=2.0.23",
+    "aiosqlite>=0.19.0",
+    "chromadb>=0.4.15",
+    "numpy>=1.24.3",
+    "scipy>=1.11.4",
+    "openai>=1.3.7",
+    "tiktoken>=0.5.2",
+    "pydantic>=2.5.0",
+    "python-multipart>=0.0.6",
+    "python-dotenv>=1.0.0",
+    "httpx>=0.25.2",
+    "requests>=2.31.0",
+    "python-dateutil>=2.8.2",
+    "structlog>=23.2.0",
+    "psutil>=5.9.6",
+    "duckduckgo-search>=6.1.0",
+    "wikipedia-api>=0.6.0",
+    "fastapi-cors>=0.0.6",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.3",
+    "pytest-asyncio>=0.21.1",
+    "pytest-cov>=4.1.0",
+    "black>=23.11.0",
+    "flake8>=6.1.0",
+    "mypy>=1.7.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/longcontext-agent/backend"
+Documentation = "https://docs.longcontext-agent.com"
+Repository = "https://github.com/longcontext-agent/backend.git"
+Issues = "https://github.com/longcontext-agent/backend/issues"
+
+[project.scripts]
+longcontext-start = "start:main"
+
+[tool.setuptools]
+package-dir = {"" = "."}
+packages = ["src"]
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = [
+    "tests",
+]
+asyncio_mode = "auto"

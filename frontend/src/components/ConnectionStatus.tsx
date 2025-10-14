@@ -1,0 +1,87 @@
+/**
+ * Connection Status Component
+ * Shows real-time backend connection status
+ */
+
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  CheckCircleIcon, 
+  ExclamationTriangleIcon,
+  XCircleIcon 
+} from '@heroicons/react/20/solid';
+import { useConnectionStatus, useSystemHealth } from '../hooks/useApi';
+
+function ConnectionStatus() {
+  const { data: isConnected, isLoading: connectionLoading } = useConnectionStatus();
+  const { data: health, isError: healthError } = useSystemHealth();
+
+  // Determine overall status
+  const getStatus = () => {
+    if (connectionLoading) return 'checking';
+    if (!isConnected) return 'disconnected';
+    if (healthError) return 'degraded';
+    if (health?.status === 'healthy') return 'healthy';
+    return 'degraded';
+  };
+
+  const status = getStatus();
+
+  const statusConfig = {
+    checking: {
+      color: 'bg-yellow-400',
+      icon: ExclamationTriangleIcon,
+      text: 'Checking connection...',
+      textColor: 'text-yellow-800'
+    },
+    healthy: {
+      color: 'bg-green-400',
+      icon: CheckCircleIcon,
+      text: 'Connected',
+      textColor: 'text-green-800'
+    },
+    degraded: {
+      color: 'bg-yellow-400',
+      icon: ExclamationTriangleIcon,
+      text: 'Limited functionality',
+      textColor: 'text-yellow-800'
+    },
+    disconnected: {
+      color: 'bg-red-400',
+      icon: XCircleIcon,
+      text: 'Connection lost',
+      textColor: 'text-red-800'
+    }
+  };
+
+  const config = statusConfig[status];
+  const IconComponent = config.icon;
+
+  // Only show if not healthy
+  if (status === 'healthy') return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -50 }}
+        className="fixed top-0 left-0 right-0 z-50"
+      >
+        <div className={`${config.color} ${config.textColor} px-4 py-2`}>
+          <div className="flex items-center justify-center space-x-2 text-sm font-medium">
+            <IconComponent className="h-4 w-4" />
+            <span>{config.text}</span>
+            {health && (
+              <span className="text-xs opacity-75">
+                • DB: {health.database_connected ? '✓' : '✗'}
+                • AI: {health.openai_api_available ? '✓' : '✗'}
+              </span>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+export default ConnectionStatus;
