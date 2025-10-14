@@ -80,8 +80,8 @@ async def lifespan(app: FastAPI):
 
 # Create FastAPI app
 app = FastAPI(
-    title="LongContext Agent API",
-    description="Production-grade agentic framework with resilient multi-turn memory system",
+    title="EverMind API",
+    description="AI agent that never forgets - Production-grade agentic framework with persistent memory",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -144,7 +144,8 @@ async def _maybe_update_session_title(session_id: str, memory_mgr: MemoryManager
 async def root():
     """Root endpoint with API information"""
     return {
-        "name": "LongContext Agent API",
+        "name": "EverMind API",
+        "tagline": "Never Forget, Always Learn",
         "version": "1.0.0",
         "status": "running",
         "uptime_seconds": time.time() - app_start_time,
@@ -152,7 +153,8 @@ async def root():
             "chat": "/chat",
             "memory": "/memory",
             "health": "/health",
-            "metrics": "/metrics"
+            "metrics": "/metrics",
+            "system": "/system"
         }
     }
 

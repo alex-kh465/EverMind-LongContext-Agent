@@ -14,13 +14,15 @@ import {
 
 interface ChatInputProps {
   onSendMessage: (message: string, options?: any) => void;
+  onFocus?: () => void;
   isLoading?: boolean;
   placeholder?: string;
   disabled?: boolean;
 }
 
 function ChatInput({ 
-  onSendMessage, 
+  onSendMessage,
+  onFocus,
   isLoading = false, 
   placeholder = "Type your message...",
   disabled = false 
@@ -79,14 +81,14 @@ function ChatInput({
   const canSend = message.trim().length > 0 && !isLoading && !disabled;
 
   return (
-    <div className="border-t border-gray-200 bg-white p-4">
+    <div className="border-t border-slate-600 bg-slate-800 p-4 shadow-lg">
       {/* Options panel */}
       {showOptions && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
-          className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200"
+          className="mb-4 p-4 bg-slate-700 rounded-lg border border-slate-600 shadow-sm"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Use Tools Toggle */}
@@ -98,22 +100,22 @@ function ChatInput({
                   onChange={(e) => setUseTools(e.target.checked)}
                   className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
                 />
-                <span className="text-sm font-medium text-gray-700">Use Tools</span>
+                <span className="text-sm font-medium text-gray-200">Use Tools</span>
               </label>
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-gray-400">
                 Enable calculator, search, etc.
               </div>
             </div>
 
             {/* Max Context Tokens */}
             <div className="flex items-center space-x-3">
-              <label className="text-sm font-medium text-gray-700 min-w-0">
+              <label className="text-sm font-medium text-gray-200 min-w-0">
                 Max Context:
               </label>
               <select
                 value={maxTokens}
                 onChange={(e) => setMaxTokens(Number(e.target.value))}
-                className="px-3 py-1 text-sm border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                className="px-3 py-1 text-sm border border-slate-500 bg-slate-600 text-slate-100 rounded-md focus:ring-primary-400 focus:border-primary-400 transition-colors"
               >
                 <option value={2000}>2K tokens</option>
                 <option value={4000}>4K tokens</option>
@@ -130,7 +132,7 @@ function ChatInput({
         {/* Attachment button */}
         <button
           type="button"
-          className="flex-shrink-0 p-2 text-gray-400 hover:text-gray-600 transition-colors"
+          className="flex-shrink-0 p-2 text-slate-400 hover:text-slate-200 transition-colors rounded-lg hover:bg-slate-700"
           title="Attach file (coming soon)"
         >
           <PlusIcon className="w-5 h-5" />
@@ -142,6 +144,7 @@ function ChatInput({
             ref={textareaRef}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
+            onFocus={() => onFocus?.()}
             onKeyDown={handleKeyDown}
             onCompositionStart={handleCompositionStart}
             onCompositionEnd={handleCompositionEnd}
@@ -149,17 +152,20 @@ function ChatInput({
             disabled={disabled}
             rows={1}
             className={`
-              w-full px-4 py-3 pr-12 text-sm border border-gray-300 rounded-2xl
-              resize-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
-              ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}
-              max-h-32 overflow-y-auto scrollbar-thin
+              w-full px-4 py-3 pr-12 text-sm border rounded-2xl text-white shadow-sm
+              resize-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition-all duration-200
+              ${disabled 
+                ? 'bg-slate-700 border-slate-600 cursor-not-allowed text-gray-400' 
+                : 'bg-slate-800 border-slate-600 hover:border-slate-500 focus:bg-slate-700'
+              }
+              max-h-32 overflow-y-auto scrollbar-thin placeholder-slate-400
             `}
             style={{ minHeight: '48px' }}
           />
           
           {/* Character count */}
           {message.length > 500 && (
-            <div className="absolute bottom-1 right-12 text-xs text-gray-400">
+            <div className="absolute bottom-1 right-12 text-xs text-slate-400">
               {message.length}
             </div>
           )}
@@ -174,8 +180,8 @@ function ChatInput({
             className={`
               p-2 rounded-lg transition-colors
               ${showOptions 
-                ? 'text-primary-600 bg-primary-50' 
-                : 'text-gray-400 hover:text-gray-600'
+                ? 'text-primary-400 bg-primary-900/50' 
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'
               }
             `}
             title="Message options"
@@ -186,7 +192,7 @@ function ChatInput({
           {/* Voice input (placeholder) */}
           <button
             type="button"
-            className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+            className="p-2 text-slate-400 hover:text-slate-200 transition-colors rounded-lg hover:bg-slate-700"
             title="Voice input (coming soon)"
           >
             <MicrophoneIcon className="w-5 h-5" />
@@ -198,10 +204,10 @@ function ChatInput({
             disabled={!canSend}
             whileTap={{ scale: 0.95 }}
             className={`
-              p-2 rounded-lg transition-all duration-200
+              p-2 rounded-lg transition-all duration-200 shadow-sm
               ${canSend
-                ? 'text-white bg-primary-500 hover:bg-primary-600 shadow-md hover:shadow-lg'
-                : 'text-gray-400 bg-gray-100 cursor-not-allowed'
+                ? 'text-white bg-primary-500 hover:bg-primary-600 shadow-md hover:shadow-lg ring-1 ring-primary-400/50'
+                : 'text-slate-400 bg-slate-600 cursor-not-allowed'
               }
             `}
             title={canSend ? 'Send message (Enter)' : 'Type a message to send'}
@@ -220,16 +226,16 @@ function ChatInput({
       </form>
 
       {/* Typing indicator / status */}
-      <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
+      <div className="mt-2 flex items-center justify-between text-xs text-slate-400">
         <div className="flex items-center space-x-2">
           {isLoading && (
             <>
               <motion.div
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 1, repeat: Infinity }}
-                className="w-1 h-1 bg-primary-500 rounded-full"
+                className="w-1 h-1 bg-primary-400 rounded-full"
               />
-              <span>Agent is thinking...</span>
+              <span className="text-slate-300">Agent is thinking...</span>
             </>
           )}
         </div>
@@ -239,7 +245,7 @@ function ChatInput({
             Press Enter to send, Shift+Enter for new line
           </span>
           {useTools && (
-            <span className="px-2 py-0.5 bg-green-100 text-green-600 rounded-full text-xs">
+            <span className="px-2 py-0.5 bg-green-900/30 text-green-400 rounded-full text-xs border border-green-700/50">
               Tools enabled
             </span>
           )}

@@ -27,17 +27,17 @@ function Layout({ children }: LayoutProps) {
   const location = useLocation();
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-900">
       {/* Sidebar */}
-      <div className="w-64 bg-white shadow-lg">
+      <div className="w-64 bg-gray-800 shadow-xl border-r border-gray-700">
         <div className="p-6">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">LC</span>
+            <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">EM</span>
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">LongContext</h1>
-              <p className="text-sm text-gray-500">Agent</p>
+              <h1 className="text-xl font-bold text-white">EverMind</h1>
+              <p className="text-sm text-gray-300">Never Forget, Always Learn</p>
             </div>
           </div>
         </div>
@@ -56,15 +56,15 @@ function Layout({ children }: LayoutProps) {
                     group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors relative
                     ${
                       isActive
-                        ? 'text-primary-600 bg-primary-50'
-                        : 'text-gray-700 hover:text-primary-600 hover:bg-gray-100'
+                        ? 'text-primary-400 bg-primary-900/50'
+                        : 'text-gray-300 hover:text-primary-400 hover:bg-gray-700'
                     }
                   `}
                 >
                   {isActive && (
                     <motion.div
                       layoutId="activeTab"
-                      className="absolute inset-0 bg-primary-50 rounded-lg"
+                      className="absolute inset-0 bg-primary-900/50 rounded-lg"
                       initial={false}
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
@@ -74,8 +74,8 @@ function Layout({ children }: LayoutProps) {
                       mr-3 h-5 w-5 flex-shrink-0 relative z-10
                       ${
                         isActive
-                          ? 'text-primary-600'
-                          : 'text-gray-400 group-hover:text-primary-600'
+                          ? 'text-primary-400'
+                          : 'text-gray-400 group-hover:text-primary-400'
                       }
                     `}
                   />
@@ -88,8 +88,8 @@ function Layout({ children }: LayoutProps) {
 
         {/* Settings Section */}
         <div className="mt-auto mb-20 px-4">
-          <div className="border-t border-gray-200 pt-4">
-            <h3 className="flex items-center px-3 mb-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          <div className="border-t border-gray-600 pt-4">
+            <h3 className="flex items-center px-3 mb-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
               <Cog6ToothIcon className="w-4 h-4 mr-2" />
               Settings
             </h3>
@@ -106,10 +106,10 @@ function Layout({ children }: LayoutProps) {
         </div>
 
         {/* Footer */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white">
-          <div className="text-xs text-gray-500 text-center">
-            <p>LongContext Agent v1.0</p>
-            <p className="mt-1">Resilient Memory System</p>
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-600 bg-gray-800">
+          <div className="text-xs text-gray-400 text-center">
+            <p>EverMind v1.0</p>
+            <p className="mt-1">AI That Never Forgets</p>
           </div>
         </div>
       </div>

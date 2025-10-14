@@ -30,6 +30,7 @@ class MemoryManager:
         self.db = db_manager
         self.retrieval_limit = int(os.getenv("RETRIEVAL_LIMIT", "10"))
         self.relevance_threshold = float(os.getenv("RELEVANCE_THRESHOLD", "0.7"))
+        self.compression_threshold = int(os.getenv("COMPRESSION_THRESHOLD", "8000"))  # Tokens
         self.retriever = None  # Will be set by the agent if needed
         
     # Session Management
@@ -467,9 +468,20 @@ class MemoryManager:
     
     async def recompute_relevance_scores(self, session_id: str):
         """Recompute relevance scores for memories"""
-        # Placeholder for relevance score recomputation
-        # This would involve analyzing conversation context and updating scores
-        pass
+        try:
+            # Decay relevance scores for old memories
+            await self.db.execute_update(
+                """UPDATE memories 
+                   SET relevance_score = relevance_score * 0.95 
+                   WHERE session_id = ? 
+                   AND timestamp < datetime('now', '-1 day')""",
+                (session_id,)
+            )
+            
+            logger.debug(f"Updated relevance scores for session {session_id}")
+            
+        except Exception as e:
+            logger.error(f"Failed to update relevance scores: {e}")
     
     async def reset_system(self) -> bool:
         """Reset entire system by clearing all data and caches"""
@@ -497,15 +509,3 @@ class MemoryManager:
         except Exception as e:
             logger.error(f"Memory system reset failed: {e}")
             return False
-            await self.db.execute_update(
-                """UPDATE memories 
-                   SET relevance_score = relevance_score * 0.95 
-                   WHERE session_id = ? 
-                   AND timestamp < datetime('now', '-1 day')""",
-                (session_id,)
-            )
-            
-            logger.debug(f"Updated relevance scores for session {session_id}")
-            
-        except Exception as e:
-            logger.error(f"Failed to update relevance scores: {e}")

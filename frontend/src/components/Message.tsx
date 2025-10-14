@@ -42,8 +42,8 @@ function Message({ message, toolCalls = [] }: MessageProps) {
     
     // Convert `code` to code with proper contrast based on message type
     const codeClass = isUser 
-      ? 'bg-primary-600 text-primary-100 px-1 py-0.5 rounded text-sm font-mono border border-primary-400'
-      : 'bg-gray-100 text-gray-800 px-1 py-0.5 rounded text-sm font-mono';
+      ? 'bg-primary-700 text-primary-100 px-1 py-0.5 rounded text-sm font-mono border border-primary-500'
+      : 'bg-gray-700 text-gray-200 px-1 py-0.5 rounded text-sm font-mono';
     content = content.replace(/`([^`]+)`/g, `<code class="${codeClass}">$1</code>`);
     
     // Convert newlines to breaks
@@ -84,11 +84,11 @@ function Message({ message, toolCalls = [] }: MessageProps) {
             flex items-center space-x-2 mb-1
             ${isUser ? 'justify-end' : 'justify-start'}
           `}>
-            <span className="text-xs font-medium text-gray-600 capitalize">
+            <span className="text-xs font-medium text-gray-300 capitalize">
               {message.role}
             </span>
-            <ClockIcon className="w-3 h-3 text-gray-400" />
-            <span className="text-xs text-gray-400">
+            <ClockIcon className="w-3 h-3 text-gray-500" />
+            <span className="text-xs text-gray-500">
               {formatTimestamp(message.timestamp)}
             </span>
             {message.metadata?.optimistic && (
@@ -102,15 +102,15 @@ function Message({ message, toolCalls = [] }: MessageProps) {
             ${isUser 
               ? 'bg-primary-600 text-white rounded-br-md shadow-md' 
               : isTool
-              ? 'bg-orange-50 border border-orange-200 text-orange-900 rounded-bl-md'
-              : 'bg-white border border-gray-200 text-gray-900 rounded-bl-md shadow-sm'
+              ? 'bg-orange-900/20 border border-orange-700 text-orange-200 rounded-bl-md'
+              : 'bg-gray-800 border border-gray-600 text-gray-100 rounded-bl-md shadow-sm'
             }
           `}>
             {renderContent()}
 
             {/* Metadata */}
             {(message.metadata?.model || message.metadata?.tokens_used) && (
-              <div className="mt-2 text-xs opacity-70 border-t border-gray-200 pt-2">
+              <div className="mt-2 text-xs opacity-70 border-t border-gray-600 pt-2">
                 {message.metadata.model && (
                   <span>Model: {message.metadata.model}</span>
                 )}
@@ -129,25 +129,25 @@ function Message({ message, toolCalls = [] }: MessageProps) {
                   key={toolCall.id}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="bg-blue-50 border border-blue-200 rounded-lg p-3"
+                  className="bg-blue-900/20 border border-blue-700 rounded-lg p-3"
                 >
                   <div className="flex items-center space-x-2 mb-2">
-                    <WrenchScrewdriverIcon className="w-4 h-4 text-blue-600" />
-                    <span className="text-sm font-medium text-blue-800 capitalize">
+                    <WrenchScrewdriverIcon className="w-4 h-4 text-blue-400" />
+                    <span className="text-sm font-medium text-blue-200 capitalize">
                       {toolCall.tool_type.replace('_', ' ')}
                     </span>
-                    <span className="text-xs text-blue-600">
+                    <span className="text-xs text-blue-300">
                       {toolCall.execution_time_ms.toFixed(1)}ms
                     </span>
                   </div>
                   
                   {/* Tool parameters */}
-                  <div className="text-xs text-blue-700 mb-2">
+                  <div className="text-xs text-blue-300 mb-2">
                     <strong>Input:</strong> {JSON.stringify(toolCall.parameters)}
                   </div>
                   
                   {/* Tool result */}
-                  <div className="text-sm text-blue-900 bg-blue-100 rounded p-2 font-mono">
+                  <div className="text-sm text-blue-100 bg-blue-900/30 rounded p-2 font-mono">
                     {typeof toolCall.result === 'string' 
                       ? toolCall.result 
                       : JSON.stringify(toolCall.result, null, 2)

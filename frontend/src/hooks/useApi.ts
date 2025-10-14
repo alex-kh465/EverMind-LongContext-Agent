@@ -31,15 +31,10 @@ export function useSendMessage() {
       // Invalidate sessions to refresh the list
       queryClient.invalidateQueries({ queryKey: queryKeys.sessions });
       
-      // Update chat cache if we have a session ID
+      // Invalidate the specific chat to trigger fresh data fetch
+      // This is more reliable than trying to update cache manually
       if (data.session_id) {
-        queryClient.setQueryData(
-          queryKeys.chat(data.session_id),
-          (oldData: ChatResponse[] | undefined) => {
-            const newData = oldData ? [...oldData, data] : [data];
-            return newData;
-          }
-        );
+        queryClient.invalidateQueries({ queryKey: queryKeys.chat(data.session_id) });
       }
     },
     onError: (error) => {
@@ -108,7 +103,7 @@ export function useUpdateSession() {
     onSuccess: (data, variables) => {
       // Invalidate sessions list to refresh after update
       queryClient.invalidateQueries({ queryKey: queryKeys.sessions });
-      // Update specific session cache
+      // Update specific session cache with the updated session data
       queryClient.setQueryData(queryKeys.chat(variables.sessionId), data);
     },
     onError: (error) => {
@@ -214,14 +209,21 @@ export function useOptimisticChat(sessionId?: string) {
     
     queryClient.setQueryData(
       queryKeys.chat(sessionId),
-      (oldData: any[] | undefined) => {
-        const optimisticMessage = {
-          ...message,
-          id: `temp-${Date.now()}`,
-          timestamp: new Date().toISOString(),
-          metadata: { ...message.metadata, optimistic: true }
-        };
-        return oldData ? [...oldData, optimisticMessage] : [optimisticMessage];
+      (oldData: any) => {
+        // Handle ConversationSession format
+        if (oldData && oldData.messages && Array.isArray(oldData.messages)) {
+          const optimisticMessage = {
+            ...message,
+            id: `temp-${Date.now()}`,
+            timestamp: new Date().toISOString(),
+            metadata: { ...message.metadata, optimistic: true }
+          };
+          return {
+            ...oldData,
+            messages: [...oldData.messages, optimisticMessage]
+          };
+        }
+        return oldData;
       }
     );
   };
@@ -231,8 +233,15 @@ export function useOptimisticChat(sessionId?: string) {
     
     queryClient.setQueryData(
       queryKeys.chat(sessionId),
-      (oldData: any[] | undefined) => {
-        return oldData ? oldData.filter(msg => msg.id !== tempId) : [];
+      (oldData: any) => {
+        // Handle ConversationSession format
+        if (oldData && oldData.messages && Array.isArray(oldData.messages)) {
+          return {
+            ...oldData,
+            messages: oldData.messages.filter((msg: any) => msg.id !== tempId)
+          };
+        }
+        return oldData;
       }
     );
   };

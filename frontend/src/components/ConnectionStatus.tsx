@@ -15,41 +15,41 @@ function ConnectionStatus() {
   const { data: isConnected, isLoading: connectionLoading } = useConnectionStatus();
   const { data: health, isError: healthError } = useSystemHealth();
 
-  // Determine overall status
+  // Determine overall status - only show critical issues
   const getStatus = () => {
-    if (connectionLoading) return 'checking';
+    // Don't show checking state to avoid flash of loading
+    if (connectionLoading) return 'healthy';
     if (!isConnected) return 'disconnected';
-    if (healthError) return 'degraded';
-    if (health?.status === 'healthy') return 'healthy';
-    return 'degraded';
+    // Don't show degraded status to avoid unnecessary popups
+    return 'healthy';
   };
 
   const status = getStatus();
 
   const statusConfig = {
     checking: {
-      color: 'bg-yellow-400',
+      color: 'bg-yellow-600',
       icon: ExclamationTriangleIcon,
       text: 'Checking connection...',
-      textColor: 'text-yellow-800'
+      textColor: 'text-yellow-100'
     },
     healthy: {
-      color: 'bg-green-400',
+      color: 'bg-green-600',
       icon: CheckCircleIcon,
       text: 'Connected',
-      textColor: 'text-green-800'
+      textColor: 'text-green-100'
     },
     degraded: {
-      color: 'bg-yellow-400',
+      color: 'bg-yellow-600',
       icon: ExclamationTriangleIcon,
       text: 'Limited functionality',
-      textColor: 'text-yellow-800'
+      textColor: 'text-yellow-100'
     },
     disconnected: {
-      color: 'bg-red-400',
+      color: 'bg-red-600',
       icon: XCircleIcon,
       text: 'Connection lost',
-      textColor: 'text-red-800'
+      textColor: 'text-red-100'
     }
   };
 
