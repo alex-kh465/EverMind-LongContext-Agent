@@ -8,8 +8,10 @@ import {
   ChatBubbleLeftRightIcon,
   CircleStackIcon,
   ChartBarIcon,
+  Cog6ToothIcon,
 } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
+import SystemResetButton from './SystemResetButton';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -83,6 +85,25 @@ function Layout({ children }: LayoutProps) {
             })}
           </div>
         </nav>
+
+        {/* Settings Section */}
+        <div className="mt-auto mb-20 px-4">
+          <div className="border-t border-gray-200 pt-4">
+            <h3 className="flex items-center px-3 mb-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <Cog6ToothIcon className="w-4 h-4 mr-2" />
+              Settings
+            </h3>
+            <div className="space-y-2">
+              <SystemResetButton 
+                className="w-full justify-center"
+                onResetComplete={() => {
+                  // Could show a toast notification here
+                  console.log('System reset completed');
+                }}
+              />
+            </div>
+          </div>
+        </div>
 
         {/* Footer */}
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white">

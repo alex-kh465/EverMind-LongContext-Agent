@@ -36,10 +36,22 @@ class HybridRetriever:
         self.semantic_weight = 0.7
         self.keyword_weight = 0.3
         self.relevance_decay_days = 7
+        
+        # OPTIMIZATION: Embedding cache to reduce API calls
+        self.embedding_cache = {}  # Simple in-memory cache
+        self.cache_max_size = 1000
     
     async def generate_embedding(self, text: str) -> Optional[List[float]]:
-        """Generate embedding for text using OpenAI API"""
+        """Generate embedding for text using OpenAI API with caching"""
         try:
+            # OPTIMIZATION: Check cache first
+            import hashlib
+            text_hash = hashlib.md5(text.encode()).hexdigest()
+            
+            if text_hash in self.embedding_cache:
+                logger.debug(f"Using cached embedding for text ({len(text)} chars)")
+                return self.embedding_cache[text_hash]
+            
             # Check circuit breaker
             if not openai_circuit_breaker.can_execute():
                 logger.warning("OpenAI circuit breaker is open, skipping embedding generation")
@@ -56,6 +68,14 @@ class HybridRetriever:
             )
             
             embedding = response.data[0].embedding
+            
+            # OPTIMIZATION: Cache the result
+            if len(self.embedding_cache) >= self.cache_max_size:
+                # Remove oldest entries (simple FIFO)
+                oldest_key = next(iter(self.embedding_cache))
+                del self.embedding_cache[oldest_key]
+            
+            self.embedding_cache[text_hash] = embedding
             
             # Record success
             openai_circuit_breaker.record_success()
@@ -157,18 +177,25 @@ class HybridRetriever:
     async def semantic_search(self, query: str, limit: int = 10, 
                             session_id: Optional[str] = None,
                             memory_types: Optional[List[MemoryType]] = None) -> List[Tuple[Memory, float]]:
-        """Perform semantic search using vector similarity"""
+        """Perform semantic search using vector similarity with timeout"""
         try:
-            # Generate query embedding
-            query_embedding = await self.generate_embedding(query)
+            # OPTIMIZATION: Add timeout for embedding generation
+            query_embedding = await asyncio.wait_for(
+                self.generate_embedding(query),
+                timeout=5.0  # 5-second timeout
+            )
+            
             if not query_embedding:
                 logger.warning("Failed to generate query embedding, falling back to keyword search")
                 return []
             
+            # OPTIMIZATION: Limit search scope for better performance
+            search_limit = min(limit * 2, 50)  # Cap at 50 to avoid slow queries
+            
             # Search vector database
             vector_results = await self.db.search_memories_vector(
                 query_embedding=query_embedding,
-                limit=limit * 2,  # Get more results for filtering
+                limit=search_limit,
                 session_id=session_id
             )
             
@@ -228,6 +255,9 @@ class HybridRetriever:
             memory_scores.sort(key=lambda x: x[1], reverse=True)
             return memory_scores[:limit]
             
+        except asyncio.TimeoutError:
+            logger.warning(f"Semantic search timed out for query: {query[:50]}...")
+            return []
         except Exception as e:
             logger.error(f"Semantic search failed: {e}")
             return []
@@ -393,6 +423,15 @@ class HybridRetriever:
         except Exception as e:
             logger.error(f"Hybrid search failed: {e}")
             return []
+    
+    def reset_cache(self):
+        """Reset embedding cache"""
+        try:
+            cache_size = len(self.embedding_cache)
+            self.embedding_cache.clear()
+            logger.info(f"Cleared {cache_size} cached embeddings")
+        except Exception as e:
+            logger.error(f"Failed to reset embedding cache: {e}")
     
     async def retrieve_context(self, query: str, session_id: str, max_tokens: int = 4000) -> Tuple[List[Memory], str]:
         """Retrieve relevant context for a query within token limits"""

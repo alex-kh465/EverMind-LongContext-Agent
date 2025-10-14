@@ -8,11 +8,13 @@ import math
 import ast
 import operator
 from typing import Dict, Any, Union, List
-from .base import BaseTool, ToolType
-
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "shared"))
+sys.path.append(os.path.dirname(__file__))
+
+from base import BaseTool
+from models import ToolType
 
 
 class SafeMathEvaluator:
@@ -409,7 +411,7 @@ class StatisticsCalculator(BaseTool):
 # Tool registration function
 def register_calculator_tools():
     """Register all calculator tools"""
-    from .base import get_tool_manager
+    from base import get_tool_manager
     
     tool_manager = get_tool_manager()
     

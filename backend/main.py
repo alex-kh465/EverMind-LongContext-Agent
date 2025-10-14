@@ -361,6 +361,38 @@ async def get_config():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/system/reset")
+async def reset_system(
+    memory_mgr: MemoryManager = Depends(get_memory_manager)
+):
+    """Reset entire system by clearing all data (WARNING: This action cannot be undone!)"""
+    try:
+        logger.warning("System reset requested - this will delete ALL data!")
+        
+        # Perform system reset
+        success = await memory_mgr.reset_system()
+        
+        if success:
+            # Note: Retriever cache will be cleared automatically when the retriever is reinitialized
+            # The memory manager reset already handles clearing the embedding cache
+            
+            logger.warning("System reset completed successfully")
+            return {
+                "success": True,
+                "message": "System reset completed successfully. All data has been cleared.",
+                "timestamp": time.time()
+            }
+        else:
+            raise HTTPException(
+                status_code=500, 
+                detail="System reset failed. Check server logs for details."
+            )
+            
+    except Exception as e:
+        logger.error(f"System reset failed: {e}")
+        raise HTTPException(status_code=500, detail=f"System reset failed: {str(e)}")
+
+
 # Exception handlers
 @app.exception_handler(Exception)
 async def general_exception_handler(request, exc):

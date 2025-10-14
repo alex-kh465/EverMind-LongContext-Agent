@@ -17,6 +17,7 @@ import {
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
 import { usePerformanceMetrics, useSystemHealth } from '../hooks/useApi';
+import SystemResetButton from './SystemResetButton';
 
 export default function MetricsDisplay() {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -116,21 +117,21 @@ export default function MetricsDisplay() {
       {/* Compact View */}
       {!isExpanded && (
         <div className="p-3">
-          <div className="grid grid-cols-3 gap-3 text-center">
-            <div>
-              <div className="text-lg font-bold text-primary-600">
-                {health?.active_sessions || 0}
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="min-w-0">
+              <div className="text-base font-bold text-primary-600 truncate">
+                {metrics?.active_sessions || 0}
               </div>
               <div className="text-xs text-gray-500">Sessions</div>
             </div>
-            <div>
-              <div className="text-lg font-bold text-green-600">
-                {metrics ? formatNumber(metrics.response_latency_ms) : '--'}ms
+            <div className="min-w-0">
+              <div className="text-base font-bold text-green-600 truncate">
+                {metrics ? `${formatNumber(metrics.response_latency_ms, 0)}ms` : '--'}
               </div>
               <div className="text-xs text-gray-500">Latency</div>
             </div>
-            <div>
-              <div className="text-lg font-bold text-blue-600">
+            <div className="min-w-0">
+              <div className="text-base font-bold text-blue-600 truncate">
                 {health ? formatBytes(health.memory_usage_mb * 1024 * 1024) : '--'}
               </div>
               <div className="text-xs text-gray-500">Memory</div>
@@ -202,21 +203,21 @@ export default function MetricsDisplay() {
                     </div>
                     <div className="bg-gray-50 p-2 rounded">
                       <div className="font-medium text-gray-900">
-                        {health?.active_sessions || '--'}
+                        {metrics?.active_sessions || '--'}
                       </div>
                       <div className="text-xs text-gray-500">Active Sessions</div>
                     </div>
                     <div className="bg-gray-50 p-2 rounded">
                       <div className="font-medium text-gray-900">
-                        {metrics ? formatNumber(metrics.memory_growth_rate * 100) : '--'}%
+                        {metrics ? formatNumber(metrics.memory_growth_rate) : '--'}
                       </div>
-                      <div className="text-xs text-gray-500">Memory Growth</div>
+                      <div className="text-xs text-gray-500">Daily Growth</div>
                     </div>
                     <div className="bg-gray-50 p-2 rounded">
                       <div className="font-medium text-gray-900">
                         {health ? formatBytes(health.memory_usage_mb * 1024 * 1024) : '--'}
                       </div>
-                      <div className="text-xs text-gray-500">System Memory</div>
+                      <div className="text-xs text-gray-500">RAM Usage</div>
                     </div>
                   </div>
                 </div>
@@ -243,11 +244,19 @@ export default function MetricsDisplay() {
                       <div className="text-xs text-gray-500">CPU Usage</div>
                     </div>
                     <div className="bg-gray-50 p-2 rounded">
+                      <div className="font-medium text-gray-900">
+                        {metrics ? `${formatNumber(metrics.vector_db_size_mb, 2)}MB` : '--'}
+                      </div>
+                      <div className="text-xs text-gray-500">Vector DB Size</div>
+                    </div>
+                    <div className="bg-gray-50 p-2 rounded">
                       <div className={`font-medium ${health.database_connected ? 'text-green-600' : 'text-red-600'}`}>
                         {health.database_connected ? 'Connected' : 'Disconnected'}
                       </div>
                       <div className="text-xs text-gray-500">Database</div>
                     </div>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3 text-sm mt-3">
                     <div className="bg-gray-50 p-2 rounded">
                       <div className={`font-medium ${health.openai_api_available ? 'text-green-600' : 'text-red-600'}`}>
                         {health.openai_api_available ? 'Available' : 'Unavailable'}
@@ -266,6 +275,26 @@ export default function MetricsDisplay() {
                   </div>
                 </div>
               )}
+              
+              {/* System Actions */}
+              <div className="border-t border-gray-200 pt-4">
+                <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
+                  <ExclamationTriangleIcon className="w-4 h-4 mr-1" />
+                  Danger Zone
+                </h4>
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <p className="text-sm text-red-700 mb-3">
+                    Reset the entire system and clear all data. This action cannot be undone.
+                  </p>
+                  <SystemResetButton 
+                    onResetComplete={() => {
+                      // Refresh metrics after reset
+                      refetchMetrics();
+                      refetchHealth();
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           </motion.div>
         )}

@@ -512,6 +512,48 @@ class DatabaseManager:
             logger.error(f"Failed to get metrics: {e}")
             return []
     
+    async def get_vector_db_size(self) -> int:
+        """Get the number of vectors in the vector database"""
+        try:
+            if self.vector_collection:
+                return self.vector_collection.count()
+            return 0
+        except Exception as e:
+            logger.warning(f"Failed to get vector database size: {e}")
+            return 0
+    
+    async def get_vector_db_storage_size_mb(self) -> float:
+        """Get the storage size of vector database in MB"""
+        try:
+            import os
+            from pathlib import Path
+            
+            # ChromaDB typically stores data in ./chroma_db/ or similar
+            # Try to find the actual storage directory
+            possible_paths = [
+                "./chroma_db",
+                "./vector_db", 
+                "./chromadb",
+                os.path.join(os.getcwd(), "chroma_db"),
+                os.path.expanduser("~/.cache/chroma")
+            ]
+            
+            total_size = 0
+            for path in possible_paths:
+                if os.path.exists(path):
+                    for root, dirs, files in os.walk(path):
+                        for file in files:
+                            file_path = os.path.join(root, file)
+                            if os.path.exists(file_path):
+                                total_size += os.path.getsize(file_path)
+                    break  # Use the first valid path found
+            
+            return total_size / (1024 * 1024)  # Convert bytes to MB
+            
+        except Exception as e:
+            logger.warning(f"Failed to calculate vector database storage size: {e}")
+            return 0.0
+    
     # Health Check
     async def health_check(self) -> bool:
         """Perform database health check"""
@@ -527,6 +569,64 @@ class DatabaseManager:
             
         except Exception as e:
             logger.error(f"Database health check failed: {e}")
+            return False
+    
+    async def reset_system(self) -> bool:
+        """Reset entire system by clearing all data"""
+        try:
+            logger.warning("Starting system reset - this will delete ALL data!")
+            
+            # Clear all tables in correct order (respecting foreign key constraints)
+            tables_to_clear = [
+                'tool_calls',
+                'metrics', 
+                'memories',
+                'messages',
+                'sessions'
+            ]
+            
+            for table in tables_to_clear:
+                try:
+                    affected = await self.execute_update(f"DELETE FROM {table}")
+                    logger.info(f"Cleared {affected} rows from {table} table")
+                except Exception as e:
+                    logger.error(f"Failed to clear {table} table: {e}")
+            
+            # Clear vector database
+            try:
+                if self.vector_collection:
+                    # ChromaDB doesn't have a clear all method, so we need to delete the collection and recreate it
+                    collection_name = self.vector_collection.name
+                    self.chroma_client.delete_collection(collection_name)
+                    
+                    # Recreate the collection
+                    self.vector_collection = self.chroma_client.create_collection(
+                        name=collection_name,
+                        metadata={"hnsw:space": "cosine"}
+                    )
+                    logger.info("Cleared and recreated vector database collection")
+            except Exception as e:
+                logger.error(f"Failed to clear vector database: {e}")
+            
+            # Reset any auto-increment counters (SQLite specific)
+            try:
+                await self.execute_update("DELETE FROM sqlite_sequence")
+                logger.info("Reset auto-increment counters")
+            except Exception as e:
+                logger.warning(f"Could not reset auto-increment counters: {e}")
+            
+            # Vacuum database to reclaim space
+            try:
+                await self.execute_update("VACUUM")
+                logger.info("Database vacuumed to reclaim space")
+            except Exception as e:
+                logger.warning(f"Could not vacuum database: {e}")
+            
+            logger.warning("System reset completed successfully!")
+            return True
+            
+        except Exception as e:
+            logger.error(f"System reset failed: {e}")
             return False
     
     # Cleanup

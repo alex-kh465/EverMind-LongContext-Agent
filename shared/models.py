@@ -120,6 +120,7 @@ class PerformanceMetrics(BaseModel):
     memory_growth_rate: float = Field(default=0.0, description="Memory growth efficiency")
     total_memories: int = Field(default=0, description="Total stored memories")
     active_sessions: int = Field(default=0, description="Active sessions count")
+    vector_db_size_mb: float = Field(default=0.0, description="Vector database storage size in MB")
 
 
 class SystemHealth(BaseModel):

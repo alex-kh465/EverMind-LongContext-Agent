@@ -1,33 +1,41 @@
 """
 Web Search Tool for LongContext Agent.
-Provides web search capabilities using DuckDuckGo API for information retrieval.
+Provides web search capabilities using SerpAPI for information retrieval.
 """
 
 import asyncio
 import aiohttp
 import json
 import re
+import os
 from typing import Dict, Any, List, Optional
 from urllib.parse import quote_plus
-from .base import BaseTool, ToolType
+
+try:
+    from serpapi import GoogleSearch
+except ImportError:
+    GoogleSearch = None
 
 import sys
-import os
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "shared"))
+sys.path.append(os.path.dirname(__file__))
+
+from base import BaseTool
+from models import ToolType
 
 
 class WebSearchTool(BaseTool):
-    """Web search tool using DuckDuckGo"""
+    """Web search tool using SerpAPI (Google Search)"""
     
     def __init__(self):
         super().__init__(
             name="web_search",
-            description="Search the web for current information and facts",
+            description="Search the web for current information, news, and facts using Google Search",
             tool_type=ToolType.WEB_SEARCH
         )
-        self.base_url = "https://api.duckduckgo.com/"
-        self.instant_url = "https://api.duckduckgo.com/"
-        self.timeout = 10  # seconds
+        self.serpapi_key = os.getenv("SERPAPI_API_KEY")
+        self.timeout = 15  # seconds
+        self.fallback_enabled = True
     
     def validate_parameters(self, parameters: Dict[str, Any]) -> bool:
         """Validate web search parameters"""
@@ -85,23 +93,27 @@ class WebSearchTool(BaseTool):
         query = parameters["query"].strip()
         max_results = parameters.get("max_results", 5)
         safe_search = parameters.get("safe_search", "moderate")
-        region = parameters.get("region", "wt-wt")
+        region = parameters.get("region", "us")
         
         try:
-            # First try instant answer API
-            instant_results = await self._get_instant_answer(query, safe_search, region)
+            # Check if SerpAPI is available and configured
+            if not self.serpapi_key:
+                raise Exception("SERPAPI_API_KEY not configured")
             
-            # Then get web search results
-            search_results = await self._get_search_results(query, max_results, safe_search, region)
+            if GoogleSearch is None:
+                raise Exception("google-search-results package not installed")
             
-            # Process and format results
-            formatted_results = self._format_results(instant_results, search_results, query)
+            # Perform search using SerpAPI
+            search_results = await self._search_with_serpapi(query, max_results, safe_search, region)
+            
+            # Format results
+            formatted_results = self._format_serpapi_results(search_results, query)
             
             return {
                 "query": query,
                 "results": formatted_results,
-                "total_results": len(search_results.get("results", [])),
-                "has_instant_answer": bool(instant_results.get("abstract")),
+                "total_results": len(formatted_results),
+                "search_engine": "google",
                 "search_metadata": {
                     "safe_search": safe_search,
                     "region": region,
@@ -110,19 +122,121 @@ class WebSearchTool(BaseTool):
             }
             
         except Exception as e:
-            # Fallback to simple text-based search
-            fallback_results = await self._fallback_search(query, max_results)
-            
-            if fallback_results:
-                return {
-                    "query": query,
-                    "results": fallback_results,
-                    "total_results": len(fallback_results),
-                    "method": "fallback",
-                    "warning": f"Primary search failed: {str(e)}"
-                }
+            # Fallback to simple search if enabled
+            if self.fallback_enabled:
+                fallback_results = await self._fallback_search(query, max_results)
+                
+                if fallback_results:
+                    return {
+                        "query": query,
+                        "results": fallback_results,
+                        "total_results": len(fallback_results),
+                        "method": "fallback",
+                        "warning": f"Primary search failed: {str(e)}"
+                    }
             
             raise Exception(f"Web search failed: {str(e)}")
+    
+    async def _search_with_serpapi(self, query: str, max_results: int, safe_search: str, region: str) -> Dict[str, Any]:
+        """Perform search using SerpAPI"""
+        try:
+            # Configure search parameters
+            search_params = {
+                "q": query,
+                "api_key": self.serpapi_key,
+                "engine": "google",
+                "num": min(max_results, 10),  # Max 10 results per request
+                "gl": region,  # Geographic location
+                "hl": "en",    # Interface language
+                "safe": "active" if safe_search == "strict" else "off",
+                "no_cache": "false"  # Use cache for better performance
+            }
+            
+            # Run in thread pool to avoid blocking
+            loop = asyncio.get_event_loop()
+            search = GoogleSearch(search_params)
+            results = await loop.run_in_executor(None, search.get_dict)
+            
+            return results
+            
+        except Exception as e:
+            raise Exception(f"SerpAPI search failed: {str(e)}")
+    
+    def _format_serpapi_results(self, results: Dict[str, Any], query: str) -> List[Dict[str, Any]]:
+        """Format SerpAPI results into consistent structure"""
+        formatted_results = []
+        
+        try:
+            # Add knowledge graph/answer box if available
+            if "knowledge_graph" in results:
+                kg = results["knowledge_graph"]
+                formatted_results.append({
+                    "type": "knowledge_graph",
+                    "title": kg.get("title", ""),
+                    "content": kg.get("description", ""),
+                    "url": kg.get("website", ""),
+                    "source": "Google Knowledge Graph",
+                    "relevance_score": 1.0,
+                    "metadata": {
+                        "type": kg.get("type", ""),
+                        "attributes": kg.get("attributes", {})
+                    }
+                })
+            
+            # Add answer box if available
+            if "answer_box" in results:
+                ab = results["answer_box"]
+                formatted_results.append({
+                    "type": "answer_box",
+                    "title": ab.get("title", "Direct Answer"),
+                    "content": ab.get("answer", ab.get("snippet", "")),
+                    "url": ab.get("displayed_link", ab.get("link", "")),
+                    "source": ab.get("displayed_link", "Google"),
+                    "relevance_score": 0.98
+                })
+            
+            # Add organic search results
+            organic_results = results.get("organic_results", [])
+            for i, result in enumerate(organic_results):
+                formatted_results.append({
+                    "type": "web_result",
+                    "title": result.get("title", ""),
+                    "content": result.get("snippet", ""),
+                    "url": result.get("link", ""),
+                    "displayed_url": result.get("displayed_link", ""),
+                    "source": result.get("displayed_link", ""),
+                    "relevance_score": 0.9 - (i * 0.05),
+                    "position": result.get("position", i + 1)
+                })
+            
+            # Add news results if available
+            news_results = results.get("news_results", [])
+            for i, news in enumerate(news_results[:3]):  # Limit to 3 news items
+                formatted_results.append({
+                    "type": "news_result",
+                    "title": news.get("title", ""),
+                    "content": news.get("snippet", ""),
+                    "url": news.get("link", ""),
+                    "source": news.get("source", ""),
+                    "date": news.get("date", ""),
+                    "relevance_score": 0.85 - (i * 0.05),
+                    "thumbnail": news.get("thumbnail", "")
+                })
+            
+            # Sort by relevance score
+            formatted_results.sort(key=lambda x: x.get("relevance_score", 0), reverse=True)
+            
+            return formatted_results
+            
+        except Exception as e:
+            # Return basic structure if formatting fails
+            return [{
+                "type": "error",
+                "title": "Search Results",
+                "content": f"Search completed but formatting failed: {str(e)}",
+                "url": "",
+                "relevance_score": 0.5
+            }]
     
     async def _get_instant_answer(self, query: str, safe_search: str, region: str) -> Dict[str, Any]:
         """Get instant answer from DuckDuckGo"""
@@ -349,18 +463,42 @@ class WikipediaTool(BaseTool):
             # Search for articles
             search_results = await self._search_wikipedia(query, max_results)
             
+            if not search_results:
+                return {
+                    "query": query,
+                    "articles": [],
+                    "total_found": 0,
+                    "returned": 0,
+                    "message": f"No Wikipedia articles found for '{query}'"
+                }
+            
             # Get article extracts
             articles = []
             for result in search_results:
-                article = await self._get_article_extract(result["title"], extract_length)
-                if article:
-                    articles.append(article)
+                try:
+                    article = await self._get_article_extract(result["title"], extract_length)
+                    if article:
+                        # Add search result metadata
+                        article["search_snippet"] = result.get("snippet", "")
+                        article["relevance_score"] = self._calculate_relevance(query, article)
+                        articles.append(article)
+                except Exception as e:
+                    # Log but continue with other articles
+                    print(f"Failed to get extract for {result.get('title', 'unknown')}: {e}")
+                    continue
+            
+            # Sort by relevance score
+            articles.sort(key=lambda x: x.get("relevance_score", 0), reverse=True)
             
             return {
                 "query": query,
                 "articles": articles,
                 "total_found": len(search_results),
-                "returned": len(articles)
+                "returned": len(articles),
+                "search_metadata": {
+                    "extract_length": extract_length,
+                    "max_results": max_results
+                }
             }
             
         except Exception as e:
@@ -422,12 +560,44 @@ class WikipediaTool(BaseTool):
             return None
         except Exception:
             return None
+    
+    def _calculate_relevance(self, query: str, article: Dict[str, Any]) -> float:
+        """Calculate relevance score between query and article"""
+        try:
+            query_lower = query.lower()
+            title_lower = article.get("title", "").lower()
+            extract_lower = article.get("extract", "").lower()
+            
+            score = 0.0
+            
+            # Title match (highest weight)
+            if query_lower in title_lower:
+                score += 0.4
+            elif any(word in title_lower for word in query_lower.split()):
+                score += 0.2
+            
+            # Extract content match
+            query_words = set(query_lower.split())
+            extract_words = set(extract_lower.split())
+            
+            if query_words:
+                common_words = query_words.intersection(extract_words)
+                score += 0.3 * (len(common_words) / len(query_words))
+            
+            # Phrase match bonus
+            if len(query.strip()) > 3 and query_lower in extract_lower:
+                score += 0.3
+            
+            return min(1.0, score)
+            
+        except Exception:
+            return 0.5  # Default relevance
 
 
 # Tool registration function
 def register_search_tools():
     """Register all search tools"""
-    from .base import get_tool_manager
+    from base import get_tool_manager
     
     tool_manager = get_tool_manager()
     

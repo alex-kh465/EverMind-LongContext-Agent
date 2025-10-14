@@ -166,6 +166,25 @@ export function useConfig() {
   });
 }
 
+// System Reset hook
+export function useSystemReset() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: () => apiClient.resetSystem(),
+    onSuccess: () => {
+      // Clear all cached data after system reset
+      queryClient.clear();
+      
+      // Force refresh of all data
+      queryClient.invalidateQueries();
+    },
+    onError: (error) => {
+      console.error('❌ System reset failed:', error);
+    },
+  });
+}
+
 // Connection status hook
 export function useConnectionStatus() {
   return useQuery({

@@ -28,9 +28,9 @@ class MemoryManager:
     
     def __init__(self, db_manager: DatabaseManager):
         self.db = db_manager
-        self.compression_threshold = int(os.getenv("COMPRESSION_THRESHOLD", "8000"))
         self.retrieval_limit = int(os.getenv("RETRIEVAL_LIMIT", "10"))
         self.relevance_threshold = float(os.getenv("RELEVANCE_THRESHOLD", "0.7"))
+        self.retriever = None  # Will be set by the agent if needed
         
     # Session Management
     async def create_session(self, title: str = "New Conversation") -> ConversationSession:
@@ -349,9 +349,13 @@ class MemoryManager:
             response_times = [m["value"] for m in recent_metrics if m["name"] == "response_time_ms"]
             avg_response_time = sum(response_times) / len(response_times) if response_times else 0.0
             
-            # Count total memories and sessions
-            total_memories_rows = await self.db.execute_query("SELECT COUNT(*) as count FROM memories")
-            total_memories = total_memories_rows[0]["count"] if total_memories_rows else 0
+            # Get vector database size (more meaningful than SQLite rows)
+            total_memories = await self.db.get_vector_db_size()
+            
+            # If vector DB is empty, fallback to SQLite count
+            if total_memories == 0:
+                total_memories_rows = await self.db.execute_query("SELECT COUNT(*) as count FROM memories")
+                total_memories = total_memories_rows[0]["count"] if total_memories_rows else 0
             
             active_sessions_rows = await self.db.execute_query(
                 "SELECT COUNT(*) as count FROM sessions WHERE updated_at > datetime('now', '-24 hours')"
@@ -366,6 +370,9 @@ class MemoryManager:
             )
             memory_growth_rate = growth_rows[0]["count"] if growth_rows else 0
             
+            # Get vector database storage size
+            vector_db_size_mb = await self.db.get_vector_db_storage_size_mb()
+            
             # TODO: Calculate context retention accuracy and retrieval precision
             # These would require evaluation datasets or user feedback
             
@@ -376,7 +383,8 @@ class MemoryManager:
                 response_latency_ms=avg_response_time,
                 memory_growth_rate=memory_growth_rate,
                 total_memories=total_memories,
-                active_sessions=active_sessions
+                active_sessions=active_sessions,
+                vector_db_size_mb=vector_db_size_mb
             )
             
         except Exception as e:
@@ -458,10 +466,37 @@ class MemoryManager:
             logger.error(f"Failed to cleanup memories: {e}")
     
     async def recompute_relevance_scores(self, session_id: str):
-        """Recompute relevance scores for session memories"""
-        # This would use more sophisticated relevance algorithms
-        # For now, just decay scores over time
+        """Recompute relevance scores for memories"""
+        # Placeholder for relevance score recomputation
+        # This would involve analyzing conversation context and updating scores
+        pass
+    
+    async def reset_system(self) -> bool:
+        """Reset entire system by clearing all data and caches"""
         try:
+            logger.warning("Resetting entire memory system...")
+            
+            # Reset database
+            reset_success = await self.db.reset_system()
+            
+            if reset_success:
+                # Clear any in-memory caches or state
+                try:
+                    if hasattr(self, 'retriever') and self.retriever:
+                        self.retriever.reset_cache()
+                        logger.info("Cleared retriever embedding cache")
+                except Exception as e:
+                    logger.warning(f"Could not clear retriever cache: {e}")
+                
+                logger.warning("Memory system reset completed successfully")
+                return True
+            else:
+                logger.error("Database reset failed")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Memory system reset failed: {e}")
+            return False
             await self.db.execute_update(
                 """UPDATE memories 
                    SET relevance_score = relevance_score * 0.95 

@@ -23,9 +23,15 @@ from memory_manager import MemoryManager
 from retriever import HybridRetriever
 from summarizer import ContextSummarizer
 from utils import (
-    generate_id, calculate_token_count, truncate_text,
-    openai_rate_limiter, openai_circuit_breaker
+    calculate_token_count, generate_id, openai_rate_limiter, 
+    openai_circuit_breaker
 )
+
+# Import tools framework
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "tools"))
+from base import ToolManager, get_tool_manager
+from calculator import CalculatorTool
+from web_search import WebSearchTool, WikipediaTool
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +55,7 @@ class LongContextAgent:
         self.system_prompt = self._build_system_prompt()
         
         # Tool management
+        self.tool_manager = get_tool_manager()
         self.available_tools = {}
         self._register_built_in_tools()
     
@@ -73,13 +80,27 @@ Remember: Your responses are enhanced by your ability to retain and reference pa
     
     def _register_built_in_tools(self):
         """Register built-in tools available to the agent"""
-        # This will be expanded when we implement the tools framework
-        # For now, placeholder for tool registration
-        pass
+        try:
+            # Register calculator tool
+            calculator = CalculatorTool()
+            self.tool_manager.register_tool(calculator)
+            
+            # Register web search tool
+            web_search = WebSearchTool()
+            self.tool_manager.register_tool(web_search)
+            
+            # Register Wikipedia tool
+            wikipedia = WikipediaTool()
+            self.tool_manager.register_tool(wikipedia)
+            
+            logger.info(f"Registered {len(self.tool_manager.list_tools())} tools")
+            
+        except Exception as e:
+            logger.error(f"Failed to register tools: {e}")
     
     async def process_message(self, message: str, session_id: Optional[str] = None,
                             use_tools: bool = True, max_context_tokens: int = 4000) -> ChatResponse:
-        """Process a user message and generate a response"""
+        """Process a user message and generate a response with optimizations"""
         start_time = time.time()
         
         try:
@@ -103,22 +124,34 @@ Remember: Your responses are enhanced by your ability to retain and reference pa
                 metadata={"session_id": session_id}
             )
             
-            # Save user message
-            await self.memory_manager.save_message(user_message, session_id)
-            
-            # Retrieve relevant context
-            context_memories, context_string = await self.retriever.retrieve_context(
-                query=message,
-                session_id=session_id,
-                max_tokens=max_context_tokens
+            # OPTIMIZATION: Start parallel operations
+            retrieval_task = asyncio.create_task(
+                self.retriever.retrieve_context(
+                    query=message,
+                    session_id=session_id,
+                    max_tokens=max_context_tokens
+                )
             )
             
-            logger.info(f"Retrieved {len(context_memories)} memories for context")
-            
-            # Check if tools should be used
-            tool_calls = []
+            tool_planning_task = None
             if use_tools:
-                tool_calls = await self._plan_and_execute_tools(message, context_string, session_id)
+                tool_planning_task = asyncio.create_task(
+                    self._plan_and_execute_tools_optimized(message, session_id)
+                )
+            
+            save_message_task = asyncio.create_task(
+                self.memory_manager.save_message(user_message, session_id)
+            )
+            
+            # Wait for parallel operations
+            context_memories, context_string = await retrieval_task
+            await save_message_task
+            
+            tool_calls = []
+            if tool_planning_task:
+                tool_calls = await tool_planning_task
+            
+            logger.info(f"Retrieved {len(context_memories)} memories for context")
             
             # Generate response
             assistant_message = await self._generate_response(
@@ -128,20 +161,29 @@ Remember: Your responses are enhanced by your ability to retain and reference pa
                 session_id=session_id
             )
             
-            # Save assistant message
-            await self.memory_manager.save_message(assistant_message, session_id)
+            # OPTIMIZATION: Save assistant message and trigger compression in parallel
+            save_assistant_task = asyncio.create_task(
+                self.memory_manager.save_message(assistant_message, session_id)
+            )
             
-            # Trigger compression if needed
-            await self._trigger_adaptive_compression(session_id)
+            compression_task = asyncio.create_task(
+                self._trigger_adaptive_compression(session_id)
+            )
+            
+            # Wait for saves to complete
+            await save_assistant_task
+            # Don't wait for compression (background operation)
             
             # Calculate metrics
             response_time_ms = (time.time() - start_time) * 1000
             
-            # Record performance metric
-            await self.memory_manager.record_metric(
-                "response_time_ms",
-                response_time_ms,
-                {"session_id": session_id, "message_tokens": calculate_token_count(message)}
+            # OPTIMIZATION: Record metric in background
+            asyncio.create_task(
+                self.memory_manager.record_metric(
+                    "response_time_ms",
+                    response_time_ms,
+                    {"session_id": session_id, "message_tokens": calculate_token_count(message)}
+                )
             )
             
             # Build response
@@ -266,6 +308,106 @@ Remember: Your responses are enhanced by your ability to retain and reference pa
             results.append(result_text)
         
         return "\n\n".join(results)
+    
+    async def _plan_and_execute_tools_optimized(self, message: str, session_id: str) -> List[ToolCall]:
+        """Optimized tool planning using the full tool manager"""
+        tool_calls = []
+        
+        try:
+            message_lower = message.lower()
+            
+            # Calculator tool detection
+            if any(word in message_lower for word in ["calculate", "compute", "math", "solve", "+", "-", "*", "/", "="]):
+                tool_call = await self._execute_tool("calculator", {"expression": message}, session_id)
+                if tool_call:
+                    tool_calls.append(tool_call)
+            
+            # Web search tool detection
+            elif any(word in message_lower for word in ["search", "find", "look up", "what is", "who is", "current", "latest", "news"]):
+                # Extract search query
+                search_query = self._extract_search_query(message)
+                if search_query:
+                    tool_call = await self._execute_tool("web_search", {"query": search_query}, session_id)
+                    if tool_call:
+                        tool_calls.append(tool_call)
+            
+            # Wikipedia tool detection
+            elif any(word in message_lower for word in ["wikipedia", "definition", "explain", "tell me about"]):
+                # Extract Wikipedia query
+                wiki_query = self._extract_wikipedia_query(message)
+                if wiki_query:
+                    tool_call = await self._execute_tool("wikipedia", {"query": wiki_query}, session_id)
+                    if tool_call:
+                        tool_calls.append(tool_call)
+            
+            return tool_calls
+            
+        except Exception as e:
+            logger.error(f"Failed to plan and execute tools: {e}")
+            return []
+    
+    async def _execute_tool(self, tool_name: str, parameters: dict, session_id: str) -> Optional[ToolCall]:
+        """Execute a tool using the tool manager"""
+        try:
+            start_time = time.time()
+            
+            # Execute tool through tool manager
+            result = await self.tool_manager.execute_tool(tool_name, parameters)
+            
+            if result and result.success:
+                execution_time = (time.time() - start_time) * 1000
+                
+                # Create ToolCall object
+                tool_call = ToolCall(
+                    id=generate_id("tool"),
+                    tool_type=ToolType.CALCULATOR if tool_name == "calculator" else (
+                        ToolType.WEB_SEARCH if tool_name == "web_search" else ToolType.WIKIPEDIA
+                    ),
+                    parameters=parameters,
+                    result=result.result,
+                    execution_time_ms=execution_time
+                )
+                
+                # Store tool result as memory
+                await self.memory_manager.store_memory(
+                    session_id=session_id,
+                    content=f"Tool '{tool_name}' executed: {result.result}",
+                    memory_type=MemoryType.TOOL_OUTPUT,
+                    metadata={
+                        "tool_name": tool_name,
+                        "parameters": parameters,
+                        "execution_time_ms": execution_time
+                    }
+                )
+                
+                return tool_call
+            else:
+                logger.warning(f"Tool {tool_name} execution failed: {result.error if result else 'No result'}")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Tool execution failed for {tool_name}: {e}")
+            return None
+    
+    def _extract_search_query(self, message: str) -> str:
+        """Extract search query from user message"""
+        import re
+        
+        # Remove common question words and commands
+        query = re.sub(r'^(search for|find|look up|what is|who is|tell me about)\s+', '', message, flags=re.IGNORECASE)
+        query = re.sub(r'\?$', '', query)  # Remove trailing question mark
+        
+        return query.strip()
+    
+    def _extract_wikipedia_query(self, message: str) -> str:
+        """Extract Wikipedia query from user message"""
+        import re
+        
+        # Remove Wikipedia-specific words and commands
+        query = re.sub(r'^(wikipedia|definition of|explain|tell me about)\s+', '', message, flags=re.IGNORECASE)
+        query = re.sub(r'\?$', '', query)  # Remove trailing question mark
+        
+        return query.strip()
     
     async def _plan_and_execute_tools(self, message: str, context: str, session_id: str) -> List[ToolCall]:
         """Plan and execute tools based on the user message"""
