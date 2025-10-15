@@ -64,7 +64,7 @@ function ChatPage() {
         const currentSessionMessages = messages.filter(msg => msg.session_id === sessionData.id);
         if (currentSessionMessages.length === 0) {
           // Convert session messages to ChatResponse format
-          const chatResponses: ChatResponse[] = sessionData.messages.map((msg, index) => ({
+          const chatResponses: ChatResponse[] = sessionData.messages.map((msg) => ({
             message: msg,
             session_id: sessionData.id,
             retrieved_memories: [], // We don't have historical memory data

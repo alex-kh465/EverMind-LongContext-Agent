@@ -13,7 +13,7 @@ import { useConnectionStatus, useSystemHealth } from '../hooks/useApi';
 
 function ConnectionStatus() {
   const { data: isConnected, isLoading: connectionLoading } = useConnectionStatus();
-  const { data: health, isError: healthError } = useSystemHealth();
+  const { data: health } = useSystemHealth();
 
   // Determine overall status - only show critical issues
   const getStatus = () => {
