@@ -275,7 +275,7 @@ GET  /health                  # System health check
 ## 🎨 Frontend Features
 
 ### Chat Interface
-- **Real-time messaging** with WebSocket support
+- **Real-time messaging** with optimistic updates
 - **Session management** with persistent history
 - **Memory visualization** showing retrieved context
 - **Tool execution tracking** with results display
@@ -451,6 +451,51 @@ This project demonstrates production-quality thinking through:
 - ✅ **Intelligence Integration** using AI for system optimization
 - ✅ **Performance Focus** with measurable improvements
 - ✅ **Innovation** in solving large context limitations
+
+---
+
+## 🧠 How It Works
+
+### 1. **Message Processing Flow**
+```
+User Input → Memory Retrieval → Context Assembly → LLM Processing → Response + Memory Storage
+     ↓              ↓                ↓               ↓                    ↓
+Session Mgmt → Semantic Search → Token Budget → Tool Integration → Compression Check
+```
+
+### 2. **Memory Lifecycle**
+- **Creation**: Messages stored with embeddings and metadata
+- **Retrieval**: Hybrid search (semantic + keyword) with temporal weighting
+- **Compression**: GPT-4o-mini summarization when thresholds exceeded
+- **Archival**: Long-term storage with indexed access
+
+### 3. **Context Window Management**
+- **Dynamic Sizing**: Adapts to model capabilities (GPT-4, Claude, etc.)
+- **Budget Allocation**: Reserves tokens for tools, responses, system prompts
+- **Intelligent Truncation**: Preserves most relevant context when limits approached
+
+### 4. **Performance Optimizations**
+- **Parallel Processing**: Concurrent retrieval, tool execution, and storage
+- **Caching Strategies**: Embedding cache, query result cache, session cache
+- **Circuit Breakers**: Prevents cascade failures in OpenAI API calls
+- **Rate Limiting**: Intelligent backoff for API quota management
+
+---
+
+## 💡 Design Philosophy
+
+### Production-Quality Thinking
+1. **Resilience First**: Built to handle failures gracefully
+2. **Performance by Design**: Every component optimized for speed and efficiency
+3. **Scalability Minded**: Architecture supports horizontal scaling
+4. **Observability Built-in**: Comprehensive metrics and monitoring
+5. **User Experience Focus**: Fast, responsive, and intuitive interface
+
+### Intelligence Integration
+- **AI-Powered Compression**: Uses GPT-4o-mini for intelligent summarization
+- **Semantic Understanding**: Vector embeddings capture meaning, not just keywords
+- **Adaptive Behavior**: System learns optimal parameters from usage patterns
+- **Context Awareness**: Deep understanding of conversation flow and user intent
 
 ---
 
