@@ -17,6 +17,7 @@ __pycache__/
 generate_diagrams.py
 
 # Virtual environments
+frontend/.env.production
 venv/
 env/
 .venv/

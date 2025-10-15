@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: longcontext-agent-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: starter
+    region: oregon
+    branch: main
+    healthCheckPath: /health
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      - key: OPENAI_SUMMARIZATION_MODEL
+        value: gpt-4o-mini
+      - key: OPENAI_MAX_TOKENS
+        value: 2000
+      - key: OPENAI_TEMPERATURE
+        value: 0.7
+      - key: DATABASE_URL
+        value: sqlite:///./data/memory.db
+      - key: COMPRESSION_THRESHOLD
+        value: 8000
+      - key: RETRIEVAL_LIMIT
+        value: 10
+      - key: RELEVANCE_THRESHOLD
+        value: 0.7
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
+      - key: LOG_LEVEL
+        value: INFO
+      - key: MAX_CONCURRENT_REQUESTS
+        value: 50
+      - key: REQUEST_TIMEOUT
+        value: 30
