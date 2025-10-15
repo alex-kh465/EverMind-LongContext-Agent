@@ -1,11 +1,20 @@
 #!/bin/bash
 
+# Set Python path to include all necessary directories
+export PYTHONPATH="/app:/app/shared:/app/backend:/app/tools"
+
 # Initialize database if needed
+cd /app/backend
 python -c "
 import asyncio
 import sys
 import os
-sys.path.append('.')
+
+# Add all paths
+sys.path.insert(0, '/app')
+sys.path.insert(0, '/app/shared')
+sys.path.insert(0, '/app/backend')
+sys.path.insert(0, '/app/tools')
 
 try:
     from database import DatabaseManager
@@ -21,5 +30,6 @@ except Exception as e:
     print('Continuing with startup...')
 "
 
-# Start the FastAPI application
+# Start the FastAPI application from backend directory
+cd /app/backend
 exec uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1
