@@ -1,4 +1,4 @@
-# LongContext Agent - Lyzr Hiring Hackathon 2025
+# EverMind LongContext Agent 
 
 **A production-grade agentic system that solves the large context problem through intelligent memory management, semantic retrieval, and adaptive compression.**
 
@@ -417,7 +417,7 @@ npm test --prefix frontend
 
 ## Acknowledgments
 
-Built for **Lyzr Hiring Hackathon 2025** - *"Engineer Intelligence, Don't Just Code"*
+Built for **Lyzr Elite Hiring Challenge 2025** - *"Engineer Intelligence, Don't Just Code"*
 
 This project demonstrates production-quality thinking through:
 - **Clean Architecture** with modular, testable components
