@@ -3,35 +3,35 @@
 ## ✅ **What's Been Implemented**
 
 ### **1. Web Search Tool (SerpAPI Integration)**
-- ✅ **SerpAPI Integration**: Full Google Search API support
-- ✅ **Rich Results**: Knowledge graphs, answer boxes, organic results, news
-- ✅ **Async Execution**: Non-blocking searches with timeout protection
-- ✅ **Relevance Scoring**: Intelligent result ranking
-- ✅ **Error Handling**: Graceful fallbacks and error messages
-- ✅ **Caching Support**: Built-in SerpAPI caching for performance
+-  **SerpAPI Integration**: Full Google Search API support
+- **Rich Results**: Knowledge graphs, answer boxes, organic results, news
+- **Async Execution**: Non-blocking searches with timeout protection
+- **Relevance Scoring**: Intelligent result ranking
+- **Error Handling**: Graceful fallbacks and error messages
+- **Caching Support**: Built-in SerpAPI caching for performance
 
 ### **2. Wikipedia Tool**
-- ✅ **Wikipedia API**: Direct integration with Wikipedia REST API
-- ✅ **Article Search**: Multiple article results with relevance scoring
-- ✅ **Content Extraction**: Article summaries with configurable length
-- ✅ **Metadata Support**: Thumbnails, article links, page IDs
-- ✅ **Error Resilience**: Handles missing articles gracefully
+- **Wikipedia API**: Direct integration with Wikipedia REST API
+- **Article Search**: Multiple article results with relevance scoring
+- **Content Extraction**: Article summaries with configurable length
+- **Metadata Support**: Thumbnails, article links, page IDs
+- **Error Resilience**: Handles missing articles gracefully
 
 ### **3. Agent Integration**
-- ✅ **Tool Manager**: Full integration with existing tool framework
-- ✅ **Keyword Detection**: Smart tool selection based on user input
-- ✅ **Parallel Execution**: Tools run alongside memory retrieval
-- ✅ **Memory Storage**: Tool results stored as memories for context
-- ✅ **Performance Optimized**: Background operations and caching
+- **Tool Manager**: Full integration with existing tool framework
+- **Keyword Detection**: Smart tool selection based on user input
+- **Parallel Execution**: Tools run alongside memory retrieval
+- **Memory Storage**: Tool results stored as memories for context
+- **Performance Optimized**: Background operations and caching
 
 ### **4. Dependencies & Setup**
-- ✅ **Requirements**: Added `google-search-results` and `aiohttp`
-- ✅ **Environment**: Updated `.env.example` with SerpAPI key
-- ✅ **Documentation**: Complete setup and usage guides
+- **Requirements**: Added `google-search-results` and `aiohttp`
+- **Environment**: Updated `.env.example` with SerpAPI key
+- **Documentation**: Complete setup and usage guides
 
 ---
 
-## 🚀 **How It Works**
+## **How It Works**
 
 ### **Tool Detection Logic:**
 ```python
@@ -71,7 +71,7 @@ SERPAPI_API_KEY=your_serpapi_key_here
 
 ---
 
-## 📊 **Tool Capabilities**
+## **Tool Capabilities**
 
 | Tool | Response Time | Features | Status |
 |------|---------------|----------|---------|
@@ -81,7 +81,7 @@ SERPAPI_API_KEY=your_serpapi_key_here
 
 ---
 
-## 🧪 **Testing Commands**
+##  **Testing Commands**
 
 ### **Calculator:**
 - "Calculate 25 * 4 + 15"
@@ -124,7 +124,7 @@ SERPAPI_API_KEY=your_serpapi_key_here
 
 ---
 
-## 🎯 **Next Steps**
+## **Next Steps**
 
 1. **Get SerpAPI Key**: Sign up at serpapi.com
 2. **Update .env File**: Add your API key
@@ -132,8 +132,8 @@ SERPAPI_API_KEY=your_serpapi_key_here
 4. **Test Tools**: Try the example commands above
 5. **Monitor Performance**: Check metrics in frontend
 
-## 🚀 **Ready to Use!**
+## **Ready to Use!**
 
 Your LongContext Agent now has **3 powerful tools** integrated and ready for use. The tools work seamlessly with the existing memory system and provide real-time, accurate information to enhance conversations.
 
-**Happy tool usage!** 🎉
+**Happy tool usage!** 

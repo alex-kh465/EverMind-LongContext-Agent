@@ -1,10 +1,9 @@
 # Performance Optimizations for LongContext Agent
 
-## 🚨 Issue: High Response Latency (~5.4 seconds)
+## Issue: High Response Latency
 
-Your original latency of **5,371ms** is indeed high. Here's what I've implemented to optimize it:
 
-## ✅ Optimizations Applied
+## Optimizations Applied
 
 ### 1. **Parallelization** 
 - **Memory retrieval** and **tool planning** now run concurrently
@@ -32,7 +31,7 @@ Your original latency of **5,371ms** is indeed high. Here's what I've implemente
 - Only essential operations wait for completion
 - **Expected improvement**: 15-25% faster response times
 
-## 📊 Expected Performance Gains
+## Expected Performance Gains
 
 | Operation | Before | After | Improvement |
 |-----------|--------|-------|-------------|
@@ -76,28 +75,28 @@ client = chromadb.Client(Settings(
 ))
 ```
 
-## 🚀 Testing Your Improvements
+## Testing Improvements
 
 1. **Restart your backend** to apply the optimizations
 2. **Send a few test messages** and check the metrics
 3. **Expected latency**: Should be **2-3 seconds** instead of 5.4s
 4. **Monitor the frontend metrics** to see real improvements
 
-## 📈 Monitoring Performance
+## Monitoring Performance
 
 The metrics display will now show:
 - **Response latency**: Should drop significantly
 - **Vector DB size**: Shows actual storage usage
 - **Cache hit rate**: Monitor embedding cache effectiveness
 
-## ⚡ Quick Wins for Even Better Performance
+## Quick Wins for Even Better Performance
 
 1. **Reduce context size**: Use 2000 tokens instead of 4000
 2. **Limit memory retrieval**: Use 5 memories instead of 10
 3. **Use faster embedding model**: Consider `text-embedding-ada-002` (cheaper, slightly less accurate)
 4. **Pre-warm cache**: Generate embeddings for common queries in advance
 
-## 🎯 Target Performance Goals
+## Target Performance Goals
 
 - **New chat response**: < 2 seconds
 - **Follow-up messages**: < 1 second (thanks to caching)

@@ -1,6 +1,6 @@
-# 🎬 LongContext Agent - Demo Script
+# LongContext Agent - Demo Script
 
-## 📹 Video Demo Overview (3-5 minutes)
+## Video Demo Overview (3-5 minutes)
 
 ### Opening (30 seconds)
 **Scene**: Split screen showing traditional chatbot vs LongContext Agent
@@ -91,7 +91,7 @@
 
 ---
 
-## 🛠️ Demo Preparation Checklist
+## Demo Preparation Checklist
 
 ### Technical Setup
 - [ ] Backend running on localhost:8000
@@ -114,7 +114,7 @@
 
 ---
 
-## 🎯 Key Demo Points
+## Key Demo Points
 
 ### Must-Show Features
 1. **Context Retention**: Reference information from 20+ messages ago
@@ -137,7 +137,7 @@
 
 ---
 
-## 📊 Demo Conversation Flow
+## Demo Conversation Flow
 
 ### Conversation 1: Technical Discussion (15 messages)
 - Discuss machine learning concepts
@@ -162,7 +162,7 @@
 
 ---
 
-## 🎬 Recording Tips
+## Recording Tips
 
 ### Video Quality
 - **Resolution**: 1080p minimum, 4K preferred
@@ -184,7 +184,7 @@
 
 ---
 
-## 📤 Submission Assets
+## Submission Assets
 
 ### Required Files
 - [ ] `demo_video.mp4` (3-5 minutes)
@@ -202,4 +202,4 @@
 
 ---
 
-*"Every second counts in a demo. Make every moment demonstrate value."* 🎬✨
+*"Every second counts in a demo. Make every moment demonstrate value."*

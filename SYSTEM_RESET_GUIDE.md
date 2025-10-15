@@ -4,34 +4,34 @@
 
 The System Reset feature allows you to completely clear all data from your LongContext Agent and start fresh. This is a **destructive operation** that cannot be undone.
 
-## ⚠️ **What Gets Deleted**
+## **What Gets Deleted**
 
 When you reset the system, **ALL** of the following data is permanently deleted:
 
-- ✅ **All conversation sessions**
-- ✅ **All messages and chat history**
-- ✅ **All stored memories**
-- ✅ **All performance metrics**
-- ✅ **All tool execution history**
-- ✅ **Vector database embeddings**
-- ✅ **Database auto-increment counters**
-- ✅ **Cached embeddings in memory**
+- **All conversation sessions**
+- **All messages and chat history**
+- **All stored memories**
+- **All performance metrics**
+- **All tool execution history**
+- **Vector database embeddings**
+- **Database auto-increment counters**
+- **Cached embeddings in memory**
 
-## 🎯 **When to Use System Reset**
+## **When to Use System Reset**
 
 ### **Good Use Cases:**
-- 🧪 **Testing**: Starting fresh for development or testing
-- 🔄 **Clean Slate**: Removing all previous conversations for privacy
-- 🐛 **Troubleshooting**: Clearing corrupted data or resolving issues
-- 📊 **Benchmarking**: Starting with clean metrics for evaluation
-- 🚀 **Production Deployment**: Clearing test data before going live
+- **Testing**: Starting fresh for development or testing
+- **Clean Slate**: Removing all previous conversations for privacy
+- **Troubleshooting**: Clearing corrupted data or resolving issues
+- **Benchmarking**: Starting with clean metrics for evaluation
+- **Production Deployment**: Clearing test data before going live
 
 ### **NOT Recommended For:**
-- ❌ Fixing small issues (try restarting the backend first)
-- ❌ Clearing just one conversation (use session delete instead)
-- ❌ Regular maintenance (not needed)
+- Fixing small issues (try restarting the backend first)
+- Clearing just one conversation (use session delete instead)
+- Regular maintenance (not needed)
 
-## 📍 **How to Access Reset**
+## **How to Access Reset**
 
 ### **Method 1: Sidebar Settings**
 1. Look for the **"Settings"** section in the left sidebar
@@ -43,7 +43,7 @@ When you reset the system, **ALL** of the following data is permanently deleted:
 3. Scroll to the **"Danger Zone"** section
 4. Click **"Reset System"**
 
-## 🔒 **Safety Features**
+## **Safety Features**
 
 ### **Confirmation Required:**
 - You must type **`DELETE ALL DATA`** exactly (case-sensitive)
@@ -51,16 +51,16 @@ When you reset the system, **ALL** of the following data is permanently deleted:
 - Multiple warnings are displayed before proceeding
 
 ### **Visual Warnings:**
-- 🔴 Red color scheme indicates danger
-- ⚠️ Warning icons throughout the interface
-- 📝 Detailed list of what will be deleted
+- Red color scheme indicates danger
+- Warning icons throughout the interface
+- Detailed list of what will be deleted
 
 ### **Process Feedback:**
-- 🔄 Loading spinner during reset process
-- ✅ Success confirmation when completed
-- ❌ Error messages if reset fails
+- Loading spinner during reset process
+- Success confirmation when completed
+- Error messages if reset fails
 
-## 🚀 **Reset Process**
+## **Reset Process**
 
 ### **What Happens:**
 1. **Backend Operations:**
@@ -76,11 +76,11 @@ When you reset the system, **ALL** of the following data is permanently deleted:
    - Forces fresh data fetching
 
 ### **Timeline:**
-- ⚡ **Small datasets**: ~1-2 seconds
-- 📊 **Medium datasets**: ~3-5 seconds  
-- 🗄️ **Large datasets**: ~5-10 seconds
+- **Small datasets**: ~1-2 seconds
+- **Medium datasets**: ~3-5 seconds  
+- **Large datasets**: ~5-10 seconds
 
-## ✅ **After Reset**
+## **After Reset**
 
 ### **What You Can Do Immediately:**
 - Start new conversations
@@ -95,7 +95,7 @@ When you reset the system, **ALL** of the following data is permanently deleted:
 - Fresh embedding cache
 - Clean database with no previous data
 
-## 🔧 **API Endpoint**
+## **API Endpoint**
 
 For advanced users or automation:
 
@@ -112,7 +112,7 @@ POST /system/reset
 }
 ```
 
-## ⚠️ **Important Notes**
+## **Important Notes**
 
 1. **No Backup**: There is no automatic backup before reset
 2. **No Undo**: This action cannot be reversed
@@ -120,7 +120,7 @@ POST /system/reset
 4. **Session Persistence**: Any open browser sessions will see empty data
 5. **Server Restart**: Not required after reset
 
-## 🆘 **If Something Goes Wrong**
+## **If Something Goes Wrong**
 
 ### **Reset Fails:**
 1. Check server logs for detailed error messages
@@ -138,7 +138,7 @@ POST /system/reset
 - You'll need to manually restore from backups if you have them
 - Consider exporting important conversations before major resets
 
-## 💡 **Tips**
+## **Tips**
 
 1. **Before Reset**: Export any important conversations if needed
 2. **Development**: Use reset frequently during development for clean testing
@@ -147,4 +147,4 @@ POST /system/reset
 
 ---
 
-**Remember: System Reset is a powerful tool that gives you a fresh start, but use it carefully since all data will be permanently lost!** 🚨
+**Remember: System Reset is a powerful tool that gives you a fresh start, but use it carefully since all data will be permanently lost!** 

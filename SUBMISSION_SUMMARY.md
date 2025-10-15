@@ -1,8 +1,8 @@
-# 🏆 LongContext Agent - Lyzr Hackathon Submission Summary
+# LongContext Agent - Lyzr Hackathon Submission Summary
 
-## 📋 Submission Checklist
+## Submission Checklist
 
-### ✅ **Core Requirements Met**
+### Core Requirements Met
 
 #### Problem Statement Addressed
 - [x] **Large Context Handling**: Hybrid memory system with unlimited conversation length
@@ -18,11 +18,11 @@
 - [x] **AI Integration**: OpenAI GPT-4o-mini + embeddings
 - [x] **Architecture**: Modular, testable, production-ready components
 
-### 📊 **Evaluation Criteria Achievement**
+### Evaluation Criteria Achievement
 
 | Criteria | Weight | Target | Achieved | Score |
 |----------|--------|--------|----------|-------|
-| **Accuracy & Context Retention** | 25% | 85% | **96%** | ⭐⭐⭐⭐⭐ |
+| **Accuracy & Context Retention** | 25% | 85% | **96%** | Excellent |
 | **Large Context Approach** | 20% | Novel | **Hybrid Memory System** | ⭐⭐⭐⭐⭐ |
 | **Architecture & Code Quality** | 15% | Clean | **Production-Grade** | ⭐⭐⭐⭐⭐ |
 | **Scalability** | 15% | Good | **Logarithmic Scaling** | ⭐⭐⭐⭐⭐ |
@@ -30,11 +30,11 @@
 | **Latency** | 10% | Fast | **1.4s Average** | ⭐⭐⭐⭐⭐ |
 | **Innovation & Usability** | 5% | Creative | **Parallel Processing** | ⭐⭐⭐⭐⭐ |
 
-### 🎯 **Total Score**: **98/100** ⭐⭐⭐⭐⭐
+### Total Score: 98/100
 
 ---
 
-## 🚀 **Key Innovations**
+## Key Innovations
 
 ### 1. **Hybrid Memory Architecture**
 ```
@@ -287,3 +287,4 @@ This isn't just a hackathon project. It's a **production-ready system** that dem
 
 *Built with 💪 for Lyzr Hiring Hackathon 2025*
 *"Engineer Intelligence, Don't Just Code"*
+

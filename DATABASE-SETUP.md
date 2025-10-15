@@ -1,6 +1,6 @@
 # 🗄️ Database Setup Guide - LongContext Agent
 
-## 📊 **Database Architecture Overview**
+##  **Database Architecture Overview**
 
 This project uses a **hybrid database architecture** combining two databases:
 
@@ -14,9 +14,9 @@ This project uses a **hybrid database architecture** combining two databases:
 - **Directory**: `vector_db/` (auto-created)
 - **Location**: `backend/vector_db/`
 
-## 🚀 **Quick Setup (Automatic)**
+##  **Quick Setup (Automatic)**
 
-### ✅ **The Good News: Zero Manual Setup Required!**
+###  **The Good News: Zero Manual Setup Required!**
 
 The databases are **automatically initialized** when you start the backend:
 
@@ -27,12 +27,12 @@ python start.py          # Start backend (auto-creates databases)
 ```
 
 **What happens automatically:**
-1. ✅ SQLite database (`memory.db`) is created with all tables
-2. ✅ ChromaDB directory (`vector_db/`) is initialized  
-3. ✅ All necessary tables and indexes are set up
-4. ✅ Vector collections are created for embeddings
+1. SQLite database (`memory.db`) is created with all tables
+2. ChromaDB directory (`vector_db/`) is initialized  
+3. All necessary tables and indexes are set up
+4. Vector collections are created for embeddings
 
-## 📋 **Database Schema Details**
+## **Database Schema Details**
 
 ### **SQLite Tables** (Automatically Created)
 
@@ -109,7 +109,7 @@ CREATE TABLE tool_calls (
 - **Distance Metric**: Cosine similarity
 - **Metadata**: session_id, memory_type, relevance_score, timestamp
 
-## 🛠️ **Environment Configuration**
+## **Environment Configuration**
 
 ### **Required Settings** in `.env`:
 
@@ -187,7 +187,7 @@ conn.close()
 "
 ```
 
-## 📊 **Database Operations**
+## **Database Operations**
 
 ### **Key Operations Available:**
 
@@ -211,7 +211,7 @@ conn.close()
    - Monitor API response times
    - Track memory compression ratios
 
-## 🔄 **Data Flow**
+## **Data Flow**
 
 ```mermaid
 graph TD
@@ -223,7 +223,7 @@ graph TD
     F --> G[Update Session]
 ```
 
-## 🧹 **Database Maintenance**
+## **Database Maintenance**
 
 ### **Reset Database** (if needed):
 ```powershell
@@ -241,38 +241,38 @@ python start.py
 Copy-Item memory.db "memory-backup-$(Get-Date -Format 'yyyy-MM-dd').db"
 ```
 
-## ✅ **Success Indicators**
+## **Success Indicators**
 
 When properly set up, you should see:
 
-1. **✅ Files Created:**
+1. **Files Created:**
    - `backend/memory.db` (SQLite database)
    - `backend/vector_db/` (ChromaDB directory)
 
-2. **✅ Backend Logs:**
+2. **Backend Logs:**
    ```
    INFO - SQLite database initialized at ./memory.db
    INFO - Created new vector collection
    INFO - Database initialization completed successfully
    ```
 
-3. **✅ Health Check:**
+3. **Health Check:**
    - http://localhost:8000/health shows all green
 
-4. **✅ Chat Functionality:**
+4. **Chat Functionality:**
    - Messages are saved and retrieved
    - Memory context works across sessions
 
 ---
 
-## 🎯 **Summary**
+## **Summary**
 
 **No manual database setup required!** 🎉
 
 The hybrid SQLite + ChromaDB architecture automatically initializes when you start the backend. Just ensure you have:
 
-1. ✅ **OpenAI API key** in your `.env` file
-2. ✅ **Backend running** via `python start.py`
-3. ✅ **Dependencies installed** from `requirements.txt`
+1. **OpenAI API key** in your `.env` file
+2. **Backend running** via `python start.py`
+3. **Dependencies installed** from `requirements.txt`
 
 The databases will be created, configured, and ready to use immediately!

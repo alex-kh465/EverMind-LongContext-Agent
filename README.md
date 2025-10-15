@@ -1,4 +1,4 @@
-# 🧠 LongContext Agent - Lyzr Hiring Hackathon 2025
+# LongContext Agent - Lyzr Hiring Hackathon 2025
 
 **A production-grade agentic system that solves the large context problem through intelligent memory management, semantic retrieval, and adaptive compression.**
 
@@ -6,20 +6,20 @@
 
 ---
 
-## 🎯 Problem Statement Solution
+## Problem Statement Solution
 
 **Challenge**: LLMs lose critical information when context exceeds their window limits, causing truncated and inconsistent outputs in multi-agent workflows.
 
 **Solution**: LongContext Agent implements a hybrid memory system that:
-- ✅ **Retains context** across unlimited conversation length
-- ✅ **Compresses intelligently** using GPT-4o-mini summaries  
-- ✅ **Retrieves semantically** with vector embeddings + keyword search
-- ✅ **Adapts gracefully** to different model context sizes
-- ✅ **Scales efficiently** with optimized token usage
+- **Retains context** across unlimited conversation length
+- **Compresses intelligently** using GPT-4o-mini summaries  
+- **Retrieves semantically** with vector embeddings + keyword search
+- **Adapts gracefully** to different model context sizes
+- **Scales efficiently** with optimized token usage
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ### Core Components
 
@@ -54,7 +54,7 @@
 
 ---
 
-## 🔄 Memory Management Flow
+## Memory Management Flow
 
 ![Memory Flow](memory_flow.png)
 
@@ -66,7 +66,7 @@
 
 ---
 
-## 🛠️ Tool Integration
+## Tool Integration
 
 ![Tool Integration](tool_integration.png)
 
@@ -78,7 +78,7 @@
 
 ---
 
-## 📊 Performance Metrics
+## Performance Metrics
 
 ![Performance Metrics](performance_metrics.png)
 
@@ -94,7 +94,7 @@
 
 ---
 
-## 🚀 Key Innovations
+## Key Innovations
 
 ### 1. **Adaptive Context Windows**
 ```python
@@ -131,7 +131,7 @@ context, tool_results = await asyncio.gather(retrieval_task, tool_task)
 
 ---
 
-## 🏃 Quick Start Guide
+## Quick Start Guide
 
 ### Prerequisites
 - Python 3.9+
@@ -176,7 +176,7 @@ VITE_APP_TITLE=LongContext Agent
 
 ---
 
-## 🧪 Testing & Validation
+## Testing & Validation
 
 ### Context Retention Test
 ```bash
@@ -196,7 +196,7 @@ pytest tests/ -v
 
 ---
 
-## 📈 Scalability Features
+## Scalability Features
 
 ### 1. **Memory Compression**
 - Automatic summarization when context exceeds thresholds
@@ -220,7 +220,7 @@ pytest tests/ -v
 
 ---
 
-## 🔧 Technical Architecture
+## Technical Architecture
 
 ### Database Schema
 ```sql
@@ -272,7 +272,7 @@ GET  /health                  # System health check
 
 ---
 
-## 🎨 Frontend Features
+## Frontend Features
 
 ### Chat Interface
 - **Real-time messaging** with optimistic updates
@@ -294,7 +294,7 @@ GET  /health                  # System health check
 
 ---
 
-## 🔍 Advanced Features
+## Advanced Features
 
 ### 1. **Smart Context Loading**
 ```python
@@ -337,7 +337,7 @@ async def adaptive_compression(self, session_id: str):
 
 ---
 
-## 📊 Evaluation Results
+## Evaluation Results
 
 ### Context Retention Accuracy: **96%**
 - Tested across 100+ multi-turn conversations  
@@ -361,7 +361,7 @@ async def adaptive_compression(self, session_id: str):
 
 ---
 
-## 🚧 Future Enhancements
+## Future Enhancements
 
 ### Planned Features
 - [ ] **Multi-modal support** (images, documents, audio)
@@ -379,19 +379,19 @@ async def adaptive_compression(self, session_id: str):
 
 ---
 
-## 🏆 Competitive Advantages
+## Competitive Advantages
 
 | Feature | Traditional RAG | LongContext Agent | Advantage |
 |---------|----------------|-------------------|-----------|
-| **Context Retention** | ❌ Fixed window | ✅ Unlimited with compression | **10x longer conversations** |
-| **Memory Quality** | ❌ Simple chunks | ✅ Intelligent summarization | **90% better relevance** |
-| **Tool Integration** | ❌ Basic function calls | ✅ Parallel execution framework | **3x faster performance** |
-| **Adaptability** | ❌ Static configuration | ✅ Dynamic context sizing | **Works with any model** |
-| **Cost Efficiency** | ❌ Linear token growth | ✅ Logarithmic with compression | **70% cost reduction** |
+| **Context Retention** |  Fixed window | Unlimited with compression | **10x longer conversations** |
+| **Memory Quality** |  Simple chunks | Intelligent summarization | **90% better relevance** |
+| **Tool Integration** |  Basic function calls | Parallel execution framework | **3x faster performance** |
+| **Adaptability** |  Static configuration | Dynamic context sizing | **Works with any model** |
+| **Cost Efficiency** |  Linear token growth | Logarithmic with compression | **70% cost reduction** |
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 ### Development Setup
 ```bash
@@ -414,47 +414,21 @@ npm test --prefix frontend
 - **Testing**: pytest, Jest, 80%+ coverage requirement
 - **Documentation**: Docstrings, type hints, API docs
 
----
 
-## 📄 License & Citation
-
-**MIT License** - See [LICENSE](LICENSE) for details
-
-### Citation
-```bibtex
-@software{longcontext_agent_2025,
-  title={LongContext Agent: Hybrid Memory System for Large Context LLM Applications},
-  author={[Your Name]},
-  year={2025},
-  url={https://github.com/yourusername/longcontext-agent},
-  note={Lyzr Hiring Hackathon 2025 Submission}
-}
-```
-
----
-
-## 📞 Contact & Support
-
-- **GitHub**: [Repository Issues](https://github.com/yourusername/longcontext-agent/issues)
-- **Documentation**: [Full API Docs](https://longcontext-agent-docs.vercel.app)
-- **Demo**: [Live Demo](https://longcontext-agent.vercel.app)
-
----
-
-## 🎉 Acknowledgments
+## Acknowledgments
 
 Built for **Lyzr Hiring Hackathon 2025** - *"Engineer Intelligence, Don't Just Code"*
 
 This project demonstrates production-quality thinking through:
-- ✅ **Clean Architecture** with modular, testable components
-- ✅ **Scalable Design** handling real-world complexity  
-- ✅ **Intelligence Integration** using AI for system optimization
-- ✅ **Performance Focus** with measurable improvements
-- ✅ **Innovation** in solving large context limitations
+- **Clean Architecture** with modular, testable components
+- **Scalable Design** handling real-world complexity  
+- **Intelligence Integration** using AI for system optimization
+- **Performance Focus** with measurable improvements
+- **Innovation** in solving large context limitations
 
 ---
 
-## 🧠 How It Works
+## How It Works
 
 ### 1. **Message Processing Flow**
 ```
@@ -482,7 +456,7 @@ Session Mgmt → Semantic Search → Token Budget → Tool Integration → Compr
 
 ---
 
-## 💡 Design Philosophy
+## Design Philosophy
 
 ### Production-Quality Thinking
 1. **Resilience First**: Built to handle failures gracefully
@@ -499,4 +473,4 @@ Session Mgmt → Semantic Search → Token Budget → Tool Integration → Compr
 
 ---
 
-*"Context is everything. LongContext Agent ensures nothing is forgotten."* 🧠✨
+*"Context is everything. LongContext Agent ensures nothing is forgotten."*
